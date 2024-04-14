@@ -1,23 +1,48 @@
 #!/usr/bin/python3
-"""Module that retrieves and prints all\
-        states from a MySQL database using SQLAlchemy."""
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from model_state import State
+"""Module that defines the State class\
+        representing a state in a MySQL database."""
 
-if __name__ == "__main__":
-    # Create the SQLAlchemy engine using the provided MySQL credentials
-    engine = create_engine("mysql+mysqldb://{}:{}@localhost/{}"
-                           .format(sys.argv[1], sys.argv[2], sys.argv[3]),
-                           pool_pre_ping=True)
-    # Create a session factory
-    Session = sessionmaker(bind=engine)
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 
-    # Create a session object
-    session = Session()
+Base = declarative_base()
 
-    # Retrieve all states from the database and print their IDs and names
-    for state in session.query(State).order_by(State.id):
-        print("{}: {}".format(state.id, state.name))
+
+class State(Base):
+    """Represents a state for a MySQL database.
+
+    __tablename__ (str): The name of the MySQL table to store States.
+    id (sqlalchemy.Integer): The state's id.
+    name (sqlalchemy.String): The state's name.
+    """
+    __tablename__ = "states"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(128), nullable=False)
+
+0x0F-python-object_relational_mapping/relationship_city.py
+
+
+#!/usr/bin/python3
+"""Module that defines the City model representing\
+        a city for a MySQL database using SQLAlchemy."""
+
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+
+# Create the base class for the declarative models
+Base = declarative_base()
+
+
+class City(Base):
+    """Represents a city for a MySQL database.
+
+    Attributes:
+        id (sqlalchemy.Column): The city's id.
+        name (sqlalchemy.Column): The city's name.
+        state_id (sqlalchemy.Column): The city's state id.
+    """
+    __tablename__ = "cities"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(128), nullable=False)
+    state_id = Column(Integer, ForeignKey("states.id"), nullable=False)
 
